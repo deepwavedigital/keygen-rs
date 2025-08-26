@@ -49,9 +49,11 @@ impl LicenseState {
         entitlements: &[String],
     ) -> Result<License> {
         let config_state = app_handle.get_keygen_config();
-        let mut config = config_state.inner().clone();
+        let mut config = config_state.lock().await;
         config.license_key = Some(key.to_string());
-        let license = keygen_rs::validate_with_config(&config, fingerprints, entitlements).await;
+
+        let license =
+            keygen_rs::validate_with_config(config.clone(), fingerprints, entitlements).await;
         if let Ok(license) = license {
             self.license = Some(license.clone());
             Self::save_license_key_cache(app_handle, &license)?;
@@ -80,10 +82,10 @@ impl LicenseState {
         if let Some(license) = &self.license {
             log::info!("Activating license for {}", fingerprint);
             let config_state = app_handle.get_keygen_config();
-            let config = config_state.inner().clone();
+            let config = config_state.lock().await;
             let machine = license
                 .clone()
-                .with_config(config)
+                .with_config(config.clone())
                 .activate(fingerprint, components)
                 .await?;
             Self::save_license_key_cache(app_handle, &license)?;
@@ -102,10 +104,10 @@ impl LicenseState {
         if let Some(license) = &self.license {
             log::info!("Deactivating license for {}", fingerprint);
             let config_state = app_handle.get_keygen_config();
-            let config = config_state.inner().clone();
+            let config = config_state.lock().await;
             match license
                 .clone()
-                .with_config(config)
+                .with_config(config.clone())
                 .deactivate(fingerprint)
                 .await
             {
@@ -131,10 +133,10 @@ impl LicenseState {
         if let Some(license) = &self.license {
             log::info!("Checking out license file: {}", license.key);
             let config_state = app_handle.get_keygen_config();
-            let config = config_state.inner().clone();
+            let config = config_state.lock().await;
             let license_file = license
                 .clone()
-                .with_config(config)
+                .with_config(config.clone())
                 .checkout(options)
                 .await?;
             if let Ok(dataset) = &license_file.decrypt(&license.key) {

@@ -41,7 +41,7 @@ pub(crate) async fn notify_license_listeners(state: &LicenseState) {
 }
 
 pub trait AppHandleExt {
-    fn get_keygen_config(&self) -> State<'_, KeygenConfig>;
+    fn get_keygen_config(&self) -> State<'_, Mutex<KeygenConfig>>;
     fn get_license_state(&self) -> State<'_, Mutex<LicenseState>>;
     fn load_license_file(&self, key: &str) -> Result<Option<LicenseFile>>;
     fn remove_license_file(&self) -> Result<()>;
@@ -51,8 +51,8 @@ pub trait AppHandleExt {
 }
 
 impl<R: Runtime> AppHandleExt for tauri::AppHandle<R> {
-    fn get_keygen_config(&self) -> State<'_, KeygenConfig> {
-        self.state::<KeygenConfig>()
+    fn get_keygen_config(&self) -> State<'_, Mutex<KeygenConfig>> {
+        self.state::<Mutex<KeygenConfig>>()
     }
 
     fn get_license_state(&self) -> State<'_, Mutex<LicenseState>> {
@@ -163,7 +163,7 @@ impl Builder {
                     keygen_config.license_key = Some(cached_license_key);
                 }
 
-                app_handle.manage(keygen_config);
+                app_handle.manage(Mutex::new(keygen_config));
                 app_handle.manage(Mutex::new(machine_state));
 
                 let license_state = LicenseState::load(app_handle);

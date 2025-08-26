@@ -100,7 +100,7 @@ You should add it to your application and initialize it before tauri-plugin-keyg
         options: &MachineCheckoutOpts,
     ) -> Result<MachineFile> {
         let config_state = app_handle.get_keygen_config();
-        let config = config_state.inner().clone();
+        let config = config_state.lock().await;
         let license_state = app_handle.get_license_state();
         let license_state = license_state.lock().await;
         if let Some(license) = &license_state.license {
@@ -110,7 +110,10 @@ You should add it to your application and initialize it before tauri-plugin-keyg
                 .with_config(config.clone())
                 .machine(&self.fingerprint)
                 .await?;
-            let machine_file = machine.with_config(config).checkout(options).await?;
+            let machine_file = machine
+                .with_config(config.clone())
+                .checkout(options)
+                .await?;
             Self::save_machine_file(app_handle, &machine_file)?;
             Ok(machine_file)
         } else {

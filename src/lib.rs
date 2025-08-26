@@ -4,6 +4,8 @@ use errors::Error;
 use license::{License, SchemeCode};
 use serde::{Deserialize, Serialize};
 
+use crate::config::KeygenConfig;
+
 pub(crate) mod certificate;
 pub(crate) mod client;
 pub(crate) mod decryptor;
@@ -105,11 +107,11 @@ pub(crate) struct KeygenResponseData<T> {
 /// ```
 pub async fn validate(fingerprints: &[String], entitlements: &[String]) -> Result<License, Error> {
     let config = get_config()?;
-    validate_with_config(&config, fingerprints, entitlements).await
+    validate_with_config(config, fingerprints, entitlements).await
 }
 
 pub async fn validate_with_config(
-    config: &config::KeygenConfig,
+    config: KeygenConfig,
     fingerprints: &[String],
     entitlements: &[String],
 ) -> Result<License, Error> {
