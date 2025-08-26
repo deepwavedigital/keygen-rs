@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.8.0] - 2025-08-26
+
+### Added
+
+- Add with_config pattern for validate and verify ([bc996c6](https://github.com/ahonn/keygen-rs/commit/bc996c6ad2e5e2a85e02eda3989fb2024b1324cc))
+- Refactor to use with_config pattern ([2fa2bae](https://github.com/ahonn/keygen-rs/commit/2fa2bae04ddf055d1433d7e9de5b6f2258fc1c68))
+
 ## [0.7.4] - 2025-08-12
 
 ### Fixed
